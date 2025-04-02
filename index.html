@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Age Calculator</title>
+    <style>
+        :root {
+            --primary: #6c5ce7;
+            --secondary: #a29bfe;
+            --accent: #fd79a8;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --success: #00b894;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--dark);
+        }
+        
+        .container {
+            background-color: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 800px;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 10px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+        
+        h1 {
+            color: var(--primary);
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .input-section {
+            background-color: rgba(108, 92, 231, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+        }
+        
+        .date-selectors {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        select {
+            padding: 12px 15px;
+            border: 2px solid var(--secondary);
+            border-radius: 8px;
+            background-color: white;
+            font-size: 1rem;
+            color: var(--dark);
+            cursor: pointer;
+            transition: all 0.3s;
+            min-width: 120px;
+        }
+        
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+        }
+        
+        .result-section {
+            text-align: left;
+            background-color: rgba(253, 121, 168, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--secondary);
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .result-label {
+            font-weight: bold;
+            color: var(--primary);
+            margin-bottom: 5px;
+            display: block;
+        }
+        
+        .result-value {
+            font-size: 1.1rem;
+            color: var(--dark);
+        }
+        
+        .days-left {
+            background-color: rgba(0, 184, 148, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            text-align: center;
+            font-weight: bold;
+            color: var(--success);
+        }
+        
+        .days-left-value {
+            font-size: 1.3rem;
+            display: block;
+            margin-top: 5px;
+        }
+        
+        .animate {
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            background-color: var(--accent);
+            opacity: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Age Calculator</h1>
+        
+        <div class="input-section">
+            <h3>Select Date of Birth</h3>
+            <div class="date-selectors">
+                <select id="year" onchange="calculateAge()">
+                    <option value="">Year</option>
+                    <!-- Years will be populated by JavaScript -->
+                </select>
+                
+                <select id="month" onchange="calculateAge()">
+                    <option value="">Month</option>
+                    <option value="0">January</option>
+                    <option value="1">February</option>
+                    <option value="2">March</option>
+                    <option value="3">April</option>
+                    <option value="4">May</option>
+                    <option value="5">June</option>
+                    <option value="6">July</option>
+                    <option value="7">August</option>
+                    <option value="8">September</option>
+                    <option value="9">October</option>
+                    <option value="10">November</option>
+                    <option value="11">December</option>
+                </select>
+                
+                <select id="day" onchange="calculateAge()">
+                    <option value="">Day</option>
+                    <!-- Days will be populated by JavaScript -->
+                </select>
+            </div>
+        </div>
+        
+        <div class="result-section" id="results" style="display: none;">
+            <div class="result-item">
+                <span class="result-label">Age</span>
+                <span class="result-value" id="age-result">-- years -- months -- days</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">In Months</span>
+                <span class="result-value" id="months-result">-- months -- days</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">In Weeks</span>
+                <span class="result-value" id="weeks-result">-- weeks -- days</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">In Days</span>
+                <span class="result-value" id="days-result">-- days</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">In Hours</span>
+                <span class="result-value" id="hours-result">-- hours</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">In Minutes</span>
+                <span class="result-value" id="minutes-result">-- minutes</span>
+            </div>
+            
+            <div class="result-item">
+                <span class="result-label">In Seconds</span>
+                <span class="result-value" id="seconds-result">-- seconds</span>
+            </div>
+            
+            <div class="days-left">
+                <span>Days Left Until Next Birthday</span>
+                <span class="days-left-value" id="next-birthday">-- days -- hours -- minutes <span id="seconds-timer">-- seconds</span></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Populate year dropdown
+        const yearSelect = document.getElementById('year');
+        const currentYear = new Date().getFullYear();
+        for (let year = currentYear; year >= 1900; year--) {
+            const option = document.createElement('option');
+            option.value = year;
+            option.textContent = year;
+            yearSelect.appendChild(option);
+        }
+        
+        // Populate day dropdown based on month and year
+        function updateDays() {
+            const daySelect = document.getElementById('day');
+            const monthSelect = document.getElementById('month');
+            const yearSelect = document.getElementById('year');
+            
+            daySelect.innerHTML = '<option value="">Day</option>';
+            
+            if (monthSelect.value && yearSelect.value) {
+                const month = parseInt(monthSelect.value);
+                const year = parseInt(yearSelect.value);
+                const daysInMonth = new Date(year, month + 1, 0).getDate();
+                
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const option = document.createElement('option');
+                    option.value = day;
+                    option.textContent = day;
+                    daySelect.appendChild(option);
+                }
+            }
+        }
+        
+        document.getElementById('month').addEventListener('change', function() {
+            updateDays();
+        });
+        
+        document.getElementById('year').addEventListener('change', function() {
+            updateDays();
+        });
+        
+        // Age calculation function
+        function calculateAge() {
+            const day = document.getElementById('day').value;
+            const month = document.getElementById('month').value;
+            const year = document.getElementById('year').value;
+            
+            if (!day || !month || !year) return;
+            
+            const birthDate = new Date(year, month, day);
+            const now = new Date();
+            
+            // Calculate age
+            let ageYears = now.getFullYear() - birthDate.getFullYear();
+            let ageMonths = now.getMonth() - birthDate.getMonth();
+            let ageDays = now.getDate() - birthDate.getDate();
+            
+            if (ageDays < 0) {
+                ageMonths--;
+                const daysInLastMonth = new Date(now.getFullYear(), now.getMonth(), 0).getDate();
+                ageDays += daysInLastMonth;
+            }
+            
+            if (ageMonths < 0) {
+                ageYears--;
+                ageMonths += 12;
+            }
+            
+            // Calculate total days
+            const diffTime = Math.abs(now - birthDate);
+            const totalDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+            
+            // Update results
+            document.getElementById('age-result').textContent = 
+                `${ageYears} years ${ageMonths} months ${ageDays} days`;
+            
+            document.getElementById('months-result').textContent = 
+                `${ageYears * 12 + ageMonths} months ${ageDays} days`;
+            
+            document.getElementById('weeks-result').textContent = 
+                `${Math.floor(totalDays / 7)} weeks ${totalDays % 7} days`;
+            
+            document.getElementById('days-result').textContent = 
+                `${totalDays} days`;
+            
+            document.getElementById('hours-result').textContent = 
+                `${totalDays * 24} hours`;
+            
+            document.getElementById('minutes-result').textContent = 
+                `${totalDays * 24 * 60} minutes`;
+            
+            document.getElementById('seconds-result').textContent = 
+                `${totalDays * 24 * 60 * 60} seconds`;
+            
+            // Calculate next birthday
+            const nextBirthday = new Date(now.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+            if (nextBirthday < now) {
+                nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
+            }
+            
+            const diffToBirthday = nextBirthday - now;
+            const daysLeft = Math.floor(diffToBirthday / (1000 * 60 * 60 * 24));
+            const hoursLeft = Math.floor((diffToBirthday % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutesLeft = Math.floor((diffToBirthday % (1000 * 60 * 60)) / (1000 * 60));
+            const secondsLeft = Math.floor((diffToBirthday % (1000 * 60)) / 1000);
+            
+            document.getElementById('next-birthday').innerHTML = 
+                `${daysLeft} days ${hoursLeft} hours ${minutesLeft} minutes <span id="seconds-timer">${secondsLeft} seconds</span>`;
+            
+            // Show results section
+            document.getElementById('results').style.display = 'block';
+            
+            // Start real-time countdown
+            if (window.birthdayInterval) {
+                clearInterval(window.birthdayInterval);
+            }
+            
+            window.birthdayInterval = setInterval(updateCountdown, 1000);
+        }
+        
+        function updateCountdown() {
+            const day = document.getElementById('day').value;
+            const month = document.getElementById('month').value;
+            const year = document.getElementById('year').value;
+            
+            if (!day || !month || !year) return;
+            
+            const birthDate = new Date(year, month, day);
+            const now = new Date();
+            
+            const nextBirthday = new Date(now.getFullYear(), birthDate.getMonth(), birthDate.getDate());
+            if (nextBirthday < now) {
+                nextBirthday.setFullYear(nextBirthday.getFullYear() + 1);
+            }
+            
+            const diffToBirthday = nextBirthday - now;
+            const daysLeft = Math.floor(diffToBirthday / (1000 * 60 * 60 * 24));
+            const hoursLeft = Math.floor((diffToBirthday % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutesLeft = Math.floor((diffToBirthday % (1000 * 60 * 60)) / (1000 * 60));
+            const secondsLeft = Math.floor((diffToBirthday % (1000 * 60)) / 1000);
+            
+            document.getElementById('seconds-timer').textContent = `${secondsLeft} seconds`;
+            
+            // Update the full string every minute to avoid constant DOM updates
+            if (secondsLeft % 60 === 0) {
+                document.getElementById('next-birthday').innerHTML = 
+                    `${daysLeft} days ${hoursLeft} hours ${minutesLeft} minutes <span id="seconds-timer">${secondsLeft} seconds</span>`;
+            }
+            
+            // Add celebration effect when birthday is today
+            if (daysLeft === 0 && hoursLeft === 0 && minutesLeft === 0 && secondsLeft < 60) {
+                celebrateBirthday();
+            }
+        }
+        
+        function celebrateBirthday() {
+            const container = document.querySelector('.container');
+            
+            // Create confetti
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.className = 'confetti';
+                confetti.style.left = Math.random() * 100 + '%';
+                confetti.style.top = -10 + 'px';
+                confetti.style.backgroundColor = getRandomColor();
+                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+                container.appendChild(confetti);
+                
+                // Animate confetti
+                setTimeout(() => {
+                    confetti.style.opacity = 1;
+                    confetti.style.top = Math.random() * 100 + '%';
+                    confetti.style.left = (parseFloat(confetti.style.left) + (Math.random() * 20 - 10)) + '%';
+                    confetti.style.transition = `all ${3 + Math.random() * 2}s linear`;
+                    
+                    setTimeout(() => {
+                        confetti.style.opacity = 0;
+                        setTimeout(() => {
+                            confetti.remove();
+                        }, 1000);
+                    }, 3000);
+                }, i * 100);
+            }
+            
+            // Make the days-left section pulse
+            const daysLeftElement = document.querySelector('.days-left');
+            daysLeftElement.classList.add('animate');
+            
+            setTimeout(() => {
+                daysLeftElement.classList.remove('animate');
+            }, 3000);
+        }
+        
+        function getRandomColor() {
+            const colors = ['#6c5ce7', '#a29bfe', '#fd79a8', '#00b894', '#fdcb6e', '#e17055'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+    </script>
+</body>
+</html>
